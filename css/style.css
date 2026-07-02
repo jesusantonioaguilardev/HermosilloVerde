@@ -45,7 +45,6 @@ html, body {
     z-index: 1;
 }
 
-/* Estilos para popups y tooltips de Leaflet */
 .leaflet-popup-content-wrapper {
     border-radius: 8px;
     box-shadow: var(--shadow-lg);
@@ -91,7 +90,6 @@ html, body {
     animation: slideInRight 0.3s ease-out;
 }
 
-/* Scrollbar personalizada */
 .sidebar::-webkit-scrollbar {
     width: 6px;
 }
@@ -436,7 +434,7 @@ h3 i {
 .api-status-box {
     padding: 15px 25px 20px;
     border-top: 2px solid var(--color-border);
-    margin-top: auto; /* Empuja el estado de la API siempre al fondo del contenedor */
+    margin-top: auto; 
 }
 
 .api-status-box p {
@@ -567,12 +565,8 @@ h3 i {
 }
 
 @keyframes pulse-active {
-    0%, 100% {
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
-    }
-    50% {
-        box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
-    }
+    0%, 100% { box-shadow: 0 0 8px rgba(76, 175, 80, 0.6); }
+    50% { box-shadow: 0 0 4px rgba(76, 175, 80, 0.4); }
 }
 
 /* ============================================
@@ -613,16 +607,10 @@ h3 i {
     margin-top: 12px;
 }
 
-/* ============================================
-   UTILIDADES
-   ============================================ */
 .hidden {
     display: none !important;
 }
 
-/* ============================================
-   TOOLTIPS DE COLONIAS
-   ============================================ */
 .colonia-tooltip {
     background: rgba(26, 58, 42, 0.95);
     color: white;
@@ -641,10 +629,10 @@ h3 i {
    SISTEMA RESPONSIVO (MEDIAS QUERIES)
    ============================================ */
 
-/* 💻 LAPTOPS Y PANTALLAS PEQUEÑAS DE ESCRITORIO (Media/Low Res) */
+/* 💻 LAPTOPS Y ESCRITORIOS MEDIANOS */
 @media (max-width: 1200px) {
     .sidebar {
-        width: 360px; /* Reducción ligera para optimizar espacio del mapa */
+        width: 360px; 
         right: 15px;
         top: 15px;
         max-height: calc(100vh - 30px);
@@ -654,16 +642,14 @@ h3 i {
         margin-right: 15px;
         width: calc(100% - 30px);
     }
-    .data-section {
-        padding: 0 15px;
-    }
+    .data-section { padding: 0 15px; }
 }
 
-/* 📑 TABLETS (Modo Vertical y pantallas medianas de 768px a 1024px) */
+/* 📑 TABLETS (769px a 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .sidebar {
         width: 340px;
-        max-height: 80vh; /* Permite ver más elementos cartográficos libres debajo */
+        max-height: 80vh; 
     }
     .legend {
         bottom: 20px;
@@ -676,70 +662,63 @@ h3 i {
     .cooling-value { font-size: 19px; }
 }
 
-/* 📱 SMARTPHONES (Pantallas móviles de 768px o menos) */
+/* 📱 SMARTPHONES (768px o menos) */
 @media (max-width: 768px) {
     html, body {
         position: relative;
     }
 
-    /* Transformación de la barra a una hoja inferior deslizante (Bottom Sheet estilo nativo) */
     .sidebar {
         width: 100%;
         max-width: 100%;
-        height: 50vh; /* Ocupa exactamente la mitad de la pantalla */
-        max-height: 55vh;
+        height: 50vh; 
+        max-height: 50vh;
         left: 0;
         right: 0;
         bottom: 0;
         top: auto;
-        border-radius: 20px 20px 0 0; /* Bordes redondeados superiores estéticos */
-        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2); /* Sombra hacia arriba */
+        border-radius: 20px 20px 0 0; 
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2); 
         animation: slideInBottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         background: #ffffff;
+        transition: transform 0.2s ease-out; /* Suaviza el arrastre e interacciones */
+        will-change: transform;
+        transform: translateY(0);
     }
 
-    @keyframes slideInBottom {
-        from {
-            transform: translateY(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+    /* Clase inyectada por JS para colapsar y esconder la pestaña */
+    .sidebar.minimizado {
+        transform: translateY(calc(50vh - 40px)) !important;
     }
 
-    /* Elemento decorativo visual superior para denotar que el panel es táctil y deslizable */
+    /* Pestaña visual superior interactiva para arrastre */
     .sidebar::before {
         content: '';
-        width: 40px;
+        width: 50px;
         height: 5px;
         background: #ccc;
         border-radius: 3px;
-        margin: 10px auto 0;
+        margin: 10px auto 5px;
         display: block;
         flex-shrink: 0;
+        cursor: pointer;
     }
 
-    .sidebar-header {
-        padding: 15px 20px 10px;
+    @keyframes slideInBottom {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
 
-    .details-header {
-        padding: 15px 20px 10px;
-    }
+    .sidebar-header { padding: 10px 20px 10px; }
+    .details-header { padding: 10px 20px 10px; }
 
     .info-box, .recommendation-box, .rationale-box, .action-btn {
         margin-left: 20px;
         margin-right: 20px;
         width: calc(100% - 40px);
     }
+    .data-section { padding: 0 20px; }
 
-    .data-section {
-        padding: 0 20px;
-    }
-
-    /* Reubicación estratégica de la Leyenda para que no colisione con el panel inferior */
     .legend {
         bottom: auto;
         top: 15px;
@@ -751,11 +730,8 @@ h3 i {
         border-radius: 8px;
     }
 
-    .legend-header h4 {
-        margin-bottom: 8px;
-    }
+    .legend-header h4 { margin-bottom: 8px; }
 
-    /* Compacta los elementos de la leyenda en una sola línea horizontal para ahorrar espacio vertical */
     .legend-items {
         display: flex;
         justify-content: space-between;
@@ -764,28 +740,16 @@ h3 i {
         padding-bottom: 8px;
     }
 
-    .legend-item {
-        margin-bottom: 0;
-        font-size: 11px;
-    }
+    .legend-item { margin-bottom: 0; font-size: 11px; }
+    .legend-color { width: 16px; height: 12px; }
+    .legend-footer { display: none; }
 
-    .legend-color {
-        width: 16px;
-        height: 12px;
-    }
-
-    .legend-footer {
-        display: none; /* Oculta detalles secundarios en móvil para maximizar espacio */
-    }
-
-    /* Ajustes finos de fuentes en entornos móviles */
     .sidebar h1 { font-size: 20px; }
     .recommendation-value { font-size: 15px; }
     .cooling-value { font-size: 18px; }
-    .action-btn { padding: 10px 14px; font-size: 13px; }
+    .action-btn { padding: 10px 14px; font-size: 13px; margin-bottom: 15px; }
     
-    /* Controladores de Leaflet (zoom) se suben un poco para no interferir con la leyenda superior */
     .leaflet-top.leaflet-left {
-        top: 90px !important;
+        top: 95px !important;
     }
 }
