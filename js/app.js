@@ -517,3 +517,73 @@ function ocultarSpinner() {
     const spinner = document.getElementById('loading-spinner');
     if (spinner) spinner.classList.remove('active');
 }
+// Variable global para rastrear el movimiento táctil
+let touchStartY = 0;
+let touchMoveY = 0;
+
+function inicializarGestosMovil() {
+    // Solo activar si estamos en un dispositivo móvil (pantalla menor a 768px)
+    if (window.innerWidth > 768) return;
+
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Detectar cuando el usuario toca la pantalla en el sidebar
+    sidebar.addEventListener('touchstart', (e) => {
+        // Guardamos el punto Y inicial del toque
+        touchStartY = e.touches[0].clientY;
+        sidebar.style.transition = 'none'; // Quitamos animación mientras se arrastra
+    }, { passive: true });
+
+    // Detectar el movimiento del dedo
+    sidebar.addEventListener('touchmove', (e) => {
+        touchMoveY = e.touches[0].clientY;
+        const deltaY = touchMoveY - touchStartY;
+
+        // Si el usuario arrastra hacia abajo (deltaY > 0)
+        if (deltaY > 0) {
+            // Mueve el panel en tiempo real siguiendo el dedo
+            sidebar.style.transform = `translateY(${deltaY}px)`;
+        }
+    }, { passive: true });
+
+    // Detectar cuando el usuario levanta el dedo
+    sidebar.addEventListener('touchend', (e) => {
+        sidebar.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+        const deltaY = touchMoveY - touchStartY;
+        const alturaPanel = sidebar.offsetHeight;
+
+        // Umbral: Si arrastró más del 25% de la altura del panel, colapsamos
+        if (deltaY > alturaPanel * 0.25) {
+            sidebar.classList.add('minimizado');
+            sidebar.style.transform = ''; // Deja que el CSS controle el estado minimizado
+        } else {
+            // Si no arrastró lo suficiente, regresa a su posición abierta
+            sidebar.classList.remove('minimizado');
+            sidebar.style.transform = 'translateY(0)';
+        }
+        
+        // Resetear variables
+        touchStartY = 0;
+        touchMoveY = 0;
+    });
+
+    // Opcional: Si el usuario hace clic en la "barra decorativa superior", alterna el estado
+    sidebar.addEventListener('click', (e) => {
+        // Si hace clic cerca del borde superior, hacemos toggle
+        if (e.clientY - sidebar.getBoundingClientRect().top < 30) {
+            sidebar.style.transition = 'transform 0.3s ease';
+            sidebar.classList.toggle('minimizado');
+            sidebar.style.transform = '';
+        }
+    });
+}
+
+// RECUERDA: Agrega `inicializarGestosMovil();` dentro de tu cargador inicial:
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarMapa();
+    cargarAPI_Clima();
+    configurarEventos();
+    mostrarSpinner();
+    inicializarGestosMovil(); // <--- Llamada obligatoria aquí
+});
