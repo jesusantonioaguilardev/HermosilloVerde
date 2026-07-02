@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hermosillo Verde AI - Simulador de Reforestación Urbana Inteligente">
+    <title>Hermosillo Verde AI - Simulador de Reforestación Urbana</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Mapa Interactivo Leaflet -->
+    <div id="map" role="main" aria-label="Mapa interactivo de Hermosillo"></div>
+
+    <!-- Panel Lateral (Sidebar) - Derecha -->
+    <div class="sidebar sidebar-right" role="region" aria-label="Panel de información">
+        <div class="sidebar-header">
+            <h1><i class="fas fa-leaf"></i> Hermosillo Verde AI</h1>
+            <p class="subtitle"><i class="fas fa-city"></i> Simulador de Reforestación Urbana Inteligente</p>
+            <hr>
+        </div>
+
+        <!-- Sección de Instrucciones Iniciales -->
+        <div id="instruction" class="info-box instruction-box">
+            <p>
+                <i class="fas fa-hand-pointer"></i> 
+                <strong>Instrucciones:</strong> Haz clic en cualquier sector del mapa para obtener un diagnóstico de reforestación basado en datos térmicos en tiempo real.
+            </p>
+        </div>
+
+        <!-- Sección de Detalles (Oculta inicialmente) -->
+        <div id="details" class="info-box details-box hidden">
+            <div class="details-header">
+                <h2><i class="fas fa-city"></i> <span id="colonia-name">-</span></h2>
+                <button id="close-details" class="close-btn" aria-label="Cerrar detalles">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Datos del Sector -->
+            <div class="data-section">
+                <h3><i class="fas fa-thermometer-half"></i> Análisis Térmico</h3>
+                <div class="data-field">
+                    <span class="label">Temperatura Superficial:</span>
+                    <span id="colonia-temp" class="value temperature-value">-</span>
+                </div>
+                <div class="data-field">
+                    <span class="label">Código AGEB:</span>
+                    <span id="ageb-code" class="value">-</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Diagnóstico de Reforestación IA -->
+            <div class="data-section">
+                <h3><i class="fas fa-brain"></i> Diagnóstico de Reforestación IA</h3>
+
+                <div class="recommendation-box">
+                    <div class="recommendation-item">
+                        <p class="recommendation-label">
+                            <i class="fas fa-tree"></i> Árboles a Plantar:
+                        </p>
+                        <p class="recommendation-value tree-count" id="tree-count">-</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <p class="recommendation-label">
+                            <i class="fas fa-leaf"></i> Especies Recomendadas:
+                        </p>
+                        <p class="recommendation-value species-text" id="species-suggested">-</p>
+                    </div>
+
+                    <div class="cooling-benefit">
+                        <p class="cooling-label">
+                            <i class="fas fa-temperature-arrow-down"></i> Reducción Térmica Estimada:
+                        </p>
+                        <p class="cooling-value" id="temp-reduction">-</p>
+                    </div>
+                </div>
+
+                <div class="rationale-box">
+                    <p>
+                        <i class="fas fa-circle-info"></i> 
+                        <strong>Justificación Técnica:</strong>
+                    </p>
+                    <p id="ai-rationale" class="rationale-text">-</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Botón de Exportación -->
+            <button id="export-btn" class="action-btn">
+                <i class="fas fa-download"></i> Descargar Diagnóstico
+            </button>
+        </div>
+
+        <!-- Estado de APIs -->
+        <div class="api-status-box">
+            <p>
+                <i class="fas fa-cloud-sun"></i> 
+                <span id="api-status-text" class="status-text">Inicializando...</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Leyenda de Simbología -->
+    <div class="legend" role="region" aria-label="Leyenda del mapa">
+        <div class="legend-header">
+            <h4><i class="fas fa-map-legend"></i> Severidad de Isla de Calor</h4>
+        </div>
+
+        <div class="legend-items">
+            <div class="legend-item">
+                <span class="legend-color critical"></span>
+                <span class="legend-label">Crítica (>44°C)</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color high"></span>
+                <span class="legend-label">Alta (41-44°C)</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color moderate"></span>
+                <span class="legend-label">Moderada (<41°C)</span>
+            </div>
+        </div>
+
+        <div class="legend-footer">
+            <p id="api-indicator" class="api-indicator">
+                <span class="status-dot"></span>
+                <span id="api-indicator-text">Conectando a APIs...</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner-circle"></div>
+        <p>Cargando mapa de Hermosillo...</p>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Application JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
