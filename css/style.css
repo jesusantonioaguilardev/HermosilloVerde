@@ -67,11 +67,13 @@ html, body {
     max-height: calc(100vh - 40px);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 1000;
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
     overflow-y: auto;
-    animation: slideInLeft 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideInRight {
@@ -91,7 +93,7 @@ html, body {
 
 /* Scrollbar personalizada */
 .sidebar::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .sidebar::-webkit-scrollbar-track {
@@ -167,10 +169,9 @@ h2 {
 }
 
 h3 {
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 15px;
     text-transform: uppercase;
-    font-size: 13px;
     letter-spacing: 0.5px;
 }
 
@@ -215,7 +216,7 @@ h3 i {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    padding: 0 25px 15px;
+    padding: 20px 25px 15px;
     border-bottom: 1px solid var(--color-border);
 }
 
@@ -257,6 +258,7 @@ h3 i {
     background: #fafafa;
     border-radius: 6px;
     font-size: 13px;
+    align-items: center;
 }
 
 .data-field .label {
@@ -432,9 +434,9 @@ h3 i {
    ESTADO DE APIS
    ============================================ */
 .api-status-box {
-    padding: 0 25px 20px;
+    padding: 15px 25px 20px;
     border-top: 2px solid var(--color-border);
-    margin-top: 15px;
+    margin-top: auto; /* Empuja el estado de la API siempre al fondo del contenedor */
 }
 
 .api-status-box p {
@@ -461,11 +463,12 @@ h3 i {
     right: auto;
     background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 16px;
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
     z-index: 1000;
-    max-width: 280px;
+    width: 260px;
     animation: slideInUp 0.3s ease-out;
 }
 
@@ -522,17 +525,9 @@ h3 i {
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.legend-color.critical {
-    background-color: var(--color-critical);
-}
-
-.legend-color.high {
-    background-color: var(--color-high);
-}
-
-.legend-color.moderate {
-    background-color: var(--color-moderate);
-}
+.legend-color.critical { background-color: var(--color-critical); }
+.legend-color.high { background-color: var(--color-high); }
+.legend-color.moderate { background-color: var(--color-moderate); }
 
 .legend-label {
     font-size: 12px;
@@ -542,7 +537,6 @@ h3 i {
 .legend-footer {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--color-border);
 }
 
 .api-indicator {
@@ -561,7 +555,6 @@ h3 i {
     border-radius: 50%;
     background: #ccc;
     display: inline-block;
-    animation: pulse 2s infinite;
 }
 
 .status-dot.active {
@@ -573,22 +566,11 @@ h3 i {
     background: var(--color-critical);
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
 @keyframes pulse-active {
     0%, 100% {
-        opacity: 1;
         box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
     }
     50% {
-        opacity: 0.7;
         box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
     }
 }
@@ -621,9 +603,7 @@ h3 i {
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 .loading-spinner p {
@@ -657,30 +637,155 @@ h3 i {
     z-index: 999;
 }
 
-.colonia-tooltip::before {
-    background-color: rgba(26, 58, 42, 0.95);
-    border: none;
+/* ============================================
+   SISTEMA RESPONSIVO (MEDIAS QUERIES)
+   ============================================ */
+
+/* 💻 LAPTOPS Y PANTALLAS PEQUEÑAS DE ESCRITORIO (Media/Low Res) */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 360px; /* Reducción ligera para optimizar espacio del mapa */
+        right: 15px;
+        top: 15px;
+        max-height: calc(100vh - 30px);
+    }
+    .info-box, .recommendation-box, .rationale-box, .action-btn {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: calc(100% - 30px);
+    }
+    .data-section {
+        padding: 0 15px;
+    }
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
+/* 📑 TABLETS (Modo Vertical y pantallas medianas de 768px a 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 340px;
+        max-height: 80vh; /* Permite ver más elementos cartográficos libres debajo */
+    }
+    .legend {
+        bottom: 20px;
+        left: 20px;
+        width: 230px;
+        padding: 12px;
+    }
+    .sidebar h1 { font-size: 21px; }
+    .recommendation-value { font-size: 16px; }
+    .cooling-value { font-size: 19px; }
+}
+
+/* 📱 SMARTPHONES (Pantallas móviles de 768px o menos) */
 @media (max-width: 768px) {
+    html, body {
+        position: relative;
+    }
+
+    /* Transformación de la barra a una hoja inferior deslizante (Bottom Sheet estilo nativo) */
     .sidebar {
         width: 100%;
         max-width: 100%;
-        max-height: 60vh;
+        height: 50vh; /* Ocupa exactamente la mitad de la pantalla */
+        max-height: 55vh;
         left: 0;
         right: 0;
         bottom: 0;
         top: auto;
-        border-radius: 12px 12px 0 0;
+        border-radius: 20px 20px 0 0; /* Bordes redondeados superiores estéticos */
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2); /* Sombra hacia arriba */
+        animation: slideInBottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        background: #ffffff;
     }
 
+    @keyframes slideInBottom {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Elemento decorativo visual superior para denotar que el panel es táctil y deslizable */
+    .sidebar::before {
+        content: '';
+        width: 40px;
+        height: 5px;
+        background: #ccc;
+        border-radius: 3px;
+        margin: 10px auto 0;
+        display: block;
+        flex-shrink: 0;
+    }
+
+    .sidebar-header {
+        padding: 15px 20px 10px;
+    }
+
+    .details-header {
+        padding: 15px 20px 10px;
+    }
+
+    .info-box, .recommendation-box, .rationale-box, .action-btn {
+        margin-left: 20px;
+        margin-right: 20px;
+        width: calc(100% - 40px);
+    }
+
+    .data-section {
+        padding: 0 20px;
+    }
+
+    /* Reubicación estratégica de la Leyenda para que no colisione con el panel inferior */
     .legend {
         bottom: auto;
-        top: 20px;
-        right: 20px;
-        max-width: 250px;
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        width: calc(100% - 30px);
+        max-width: none;
+        padding: 10px 14px;
+        border-radius: 8px;
+    }
+
+    .legend-header h4 {
+        margin-bottom: 8px;
+    }
+
+    /* Compacta los elementos de la leyenda en una sola línea horizontal para ahorrar espacio vertical */
+    .legend-items {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 5px;
+        padding-bottom: 8px;
+    }
+
+    .legend-item {
+        margin-bottom: 0;
+        font-size: 11px;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 12px;
+    }
+
+    .legend-footer {
+        display: none; /* Oculta detalles secundarios en móvil para maximizar espacio */
+    }
+
+    /* Ajustes finos de fuentes en entornos móviles */
+    .sidebar h1 { font-size: 20px; }
+    .recommendation-value { font-size: 15px; }
+    .cooling-value { font-size: 18px; }
+    .action-btn { padding: 10px 14px; font-size: 13px; }
+    
+    /* Controladores de Leaflet (zoom) se suben un poco para no interferir con la leyenda superior */
+    .leaflet-top.leaflet-left {
+        top: 90px !important;
     }
 }
