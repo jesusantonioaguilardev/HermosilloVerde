@@ -361,27 +361,114 @@ function exportarDiagnostico() {
     if (!window.diagnosticoActual) return;
     const { props, diagnostico, justificacion, especies } = window.diagnosticoActual;
 
-    const salida = {
-        fecha: new Date().toISOString(),
-        colonia: props.nombre,
-        area_ha: props.area_ha,
-        poblacion: props.poblacion,
-        densidad_hab_km2: props.densidad_hab_km2,
-        terreno_utilizable_ha: props.terreno_utilizable_ha,
-        terreno_utilizable_pct: props.terreno_utilizable_pct,
-        temperatura_estimada: `${diagnostico.temp.toFixed(1)}°C`,
-        severidad: diagnostico.severidad,
-        arboles_recomendados: diagnostico.arboles,
-        especies_recomendadas: especies,
-        reduccion_termica_estimada: `${diagnostico.reduccion.toFixed(1)}°C`,
-        justificacion_tecnica: justificacion
-    };
+    const fechaHoy = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
 
-    const blob = new Blob([JSON.stringify(salida, null, 2)], { type: 'application/json' });
+   
+    const contenidoHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset="utf-8">
+            <title>Reporte de Diagnóstico Urbano - Hermosillo Verde</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; color: #333333; line-height: 1.6; }
+                h1 { color: #2a9d8f; font-size: 22pt; margin-bottom: 5pt; border-bottom: 2px solid #2a9d8f; padding-bottom: 5pt; }
+                h2 { color: #264653; font-size: 14pt; margin-top: 20pt; margin-bottom: 8pt; }
+                p { font-size: 11pt; margin-bottom: 10pt; }
+                .meta-table { width: 100%; border-collapse: collapse; margin-top: 15pt; margin-bottom: 15pt; }
+                .meta-table th, .meta-table td { border: 1px solid #cccccc; padding: 8px; font-size: 10.5pt; text-align: left; }
+                .meta-table th { background-color: #f4f4f4; color: #264653; font-weight: bold; width: 40%; }
+                .badge { font-weight: bold; padding: 3px 8px; border-radius: 3px; color: white; text-transform: uppercase; display: inline-block; }
+                .critica { background-color: #d90429; }
+                .alta { background-color: #f77f00; }
+                .moderada { background-color: #fcbf49; color: #333333; }
+                .destacado { background-color: #e8f5f3; border-left: 4px solid #2a9d8f; padding: 12px; margin-top: 15pt; margin-bottom: 15pt; }
+                .footer { font-size: 9pt; color: #777777; margin-top: 40pt; border-top: 1px solid #dddddd; padding-top: 5pt; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <h1>Reporte de Diagnóstico Urbano</h1>
+            <p><strong>Plataforma:</strong> Hermosillo Verde &bull; Simulador de Reforestación</p>
+            <p><strong>Fecha de Generación:</strong> ${fechaHoy}</p>
+            
+            <h2>1. Información General del Sector</h2>
+            <table class="meta-table">
+                <tr>
+                    <th>Colonia / Sector</th>
+                    <td><strong>${props.nombre}</strong></td>
+                </tr>
+                <tr>
+                    <th>Código AGEB</th>
+                    <td>${props.num_agebs || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <th>Superficie Total</th>
+                    <td>${props.area_ha.toLocaleString()} ha</td>
+                </tr>
+                <tr>
+                    <th>Población Absoluta</th>
+                    <td>${props.poblacion.toLocaleString()} habitantes</td>
+                </tr>
+                <tr>
+                    <th>Densidad de Población</th>
+                    <td>${props.densidad_hab_km2.toLocaleString()} hab/km²</td>
+                </tr>
+            </table>
+
+            <h2>2. Diagnóstico Térmico e Isla de Calor</h2>
+            <table class="meta-table">
+                <tr>
+                    <th>Temperatura Estimada en Zona</th>
+                    <td><strong>${diagnostico.temp.toFixed(1)}°C</strong></td>
+                </tr>
+                <tr>
+                    <th>Nivel de Severidad Térmica</th>
+                    <td><span class="badge ${diagnostico.severidad}">${diagnostico.severidad}</span></td>
+                </tr>
+            </table>
+
+            <h2>3. Plan de Intervención Forestal Propuesto</h2>
+            <table class="meta-table">
+                <tr>
+                    <th>Terreno Utilizable para Plantación</th>
+                    <td>${props.terreno_utilizable_ha} ha (${props.terreno_utilizable_pct}%)</td>
+                </tr>
+                <tr>
+                    <th>Cuota de Árboles Recomendada</th>
+                    <td><strong>${diagnostico.arboles.toLocaleString()} árboles</strong></td>
+                </tr>
+                <tr>
+                    <th>Especies Nativas Sugeridas</th>
+                    <td>${especies}</td>
+                </tr>
+                <tr>
+                    <th>Mitigación Térmica Estimada</th>
+                    <td><strong>-${diagnostico.reduccion.toFixed(1)}°C de reducción</strong></td>
+                </tr>
+            </table>
+
+            <h2>4. Justificación Técnica</h2>
+            <div class="destacado">
+                <p style="margin: 0; font-style: italic;">"${justificacion}"</p>
+            </div>
+
+            <div class="footer">
+                <p>Documento generado de forma automatizada por Hermosillo Verde &copy; 2026. Diseñado para la resiliencia climática urbana.</p>
+            </div>
+        </body>
+        </html>
+    `;
+
+
+    const blob = new Blob(['\ufeff' + contenidoHtml], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `diagnostico_${props.nombre.replace(/\s+/g, '_')}.json`;
+    
+  
+    link.download = `Diagnostico_Urbano_${props.nombre.replace(/\s+/g, '_')}.doc`;
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
