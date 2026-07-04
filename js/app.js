@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarClimaReal();
     inicializarGestosMovil();
     
-    // Forzar el estado compacto inicial al cargar
+    
     mostrarInstrucciones();
     
     setInterval(cargarClimaReal, CONFIG.intervaloClimaMs);
@@ -177,9 +177,7 @@ function generarJustificacion(props, diagnostico) {
     return plantillas[diagnostico.severidad];
 }
 
-// =======================================================
-// NUEVAS FUNCIONES DE CONTROL DE INTERFAZ (.COMPACT)
-// =======================================================
+
 function mostrarInstrucciones() {
     const instPanel = document.getElementById('instruction');
     const detPanel = document.getElementById('details');
@@ -219,7 +217,7 @@ function seleccionarColonia(layer, feature) {
     const especies = CONFIG.especies[diagnostico.severidad];
     const justificacion = generarJustificacion(props, diagnostico);
 
-    // Cambiar estado visual del panel mediante las nuevas funciones
+  
     mostrarDetalles();
 
     if (sidebar) {
@@ -231,7 +229,6 @@ function seleccionarColonia(layer, feature) {
         if (btnReabrir) btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
     }
 
-    // Inyección robusta mapeando variantes de IDs comunes de tus versiones
     const elNombre = document.getElementById('colonia-name') || document.getElementById('colonia-nombre');
     if (elNombre) elNombre.textContent = props.nombre;
 
@@ -391,7 +388,7 @@ function configurarEventos() {
 }
 
 function cerrarDetalles() {
-    // Activar instrucciones y compactación mediante la nueva lógica
+  
     mostrarInstrucciones();
 
     if (sectorSeleccionado) {
