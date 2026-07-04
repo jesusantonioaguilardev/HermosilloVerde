@@ -444,36 +444,34 @@ h3 i { color: var(--color-primary); }
         transform: translateY(0);
         display: flex;
         flex-direction: column; 
-        overflow: hidden; 
+        overflow: hidden;
     }
 
- 
-    .sidebar-handle {
-        width: 100%;
-        height: 40px; 
+
+    .sidebar-header {
+        padding: 6px 20px 0 20px;
         flex-shrink: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
         cursor: grab;
         background: #ffffff;
     }
 
-    .sidebar-handle::before {
+
+    .sidebar-header::before {
         content: '';
         width: 40px;
         height: 5px;
         background: #e5e5e5;
         border-radius: 10px;
+        margin: 6px auto 10px auto;
+        display: block;
     }
 
-    
-    .sidebar .sidebar-content, 
+
     .sidebar #instruction, 
     .sidebar #details {
-        flex- earners: 1;
+        flex: 1;
         overflow-y: auto; 
-        padding: 0 20px 20px 20px;
+        padding: 10px 20px 20px 20px;
         -webkit-overflow-scrolling: touch;
     }
 
