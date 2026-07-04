@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarClimaReal();
     inicializarGestosMovil();
     
-    
     mostrarInstrucciones();
     
     setInterval(cargarClimaReal, CONFIG.intervaloClimaMs);
@@ -177,7 +176,6 @@ function generarJustificacion(props, diagnostico) {
     return plantillas[diagnostico.severidad];
 }
 
-
 function mostrarInstrucciones() {
     const instPanel = document.getElementById('instruction');
     const detPanel = document.getElementById('details');
@@ -217,7 +215,6 @@ function seleccionarColonia(layer, feature) {
     const especies = CONFIG.especies[diagnostico.severidad];
     const justificacion = generarJustificacion(props, diagnostico);
 
-  
     mostrarDetalles();
 
     if (sidebar) {
@@ -388,7 +385,6 @@ function configurarEventos() {
 }
 
 function cerrarDetalles() {
-  
     mostrarInstrucciones();
 
     if (sectorSeleccionado) {
