@@ -31,12 +31,18 @@ let temperaturaBase = 40.0;
 let touchStartY = 0;
 let touchMoveY = 0;
 
+const sidebar = document.querySelector('.sidebar');
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarMapa();
     configurarEventos();
     mostrarSpinner();
     cargarClimaReal();
     inicializarGestosMovil();
+    
+    // Forzar el estado compacto inicial al cargar
+    mostrarInstrucciones();
+    
     setInterval(cargarClimaReal, CONFIG.intervaloClimaMs);
 });
 
@@ -171,6 +177,29 @@ function generarJustificacion(props, diagnostico) {
     return plantillas[diagnostico.severidad];
 }
 
+// =======================================================
+// NUEVAS FUNCIONES DE CONTROL DE INTERFAZ (.COMPACT)
+// =======================================================
+function mostrarInstrucciones() {
+    const instPanel = document.getElementById('instruction');
+    const detPanel = document.getElementById('details');
+    
+    if (instPanel) instPanel.classList.remove('hidden');
+    if (detPanel) detPanel.classList.add('hidden');
+
+    if (sidebar) sidebar.classList.add('compact');
+}
+
+function mostrarDetalles() {
+    const instPanel = document.getElementById('instruction');
+    const detPanel = document.getElementById('details');
+
+    if (instPanel) instPanel.classList.add('hidden');
+    if (detPanel) detPanel.classList.remove('hidden');
+
+    if (sidebar) sidebar.classList.remove('compact');
+}
+
 function seleccionarColonia(layer, feature) {
     const props = feature.properties;
 
@@ -190,31 +219,50 @@ function seleccionarColonia(layer, feature) {
     const especies = CONFIG.especies[diagnostico.severidad];
     const justificacion = generarJustificacion(props, diagnostico);
 
-    document.getElementById('instruction').classList.add('hidden');
-    document.getElementById('details').classList.remove('hidden');
+    // Cambiar estado visual del panel mediante las nuevas funciones
+    mostrarDetalles();
 
-    const sidebarElement = document.querySelector('.sidebar');
-    if (sidebarElement) {
-        sidebarElement.classList.remove('minimizado');
-        sidebarElement.style.transform = 'translateY(0)';
-        sidebarElement.scrollTop = 0; // Regresa el contenido arriba al abrir una nueva colonia
+    if (sidebar) {
+        sidebar.classList.remove('minimizado');
+        sidebar.style.transform = 'translateY(0)';
+        sidebar.scrollTop = 0; 
         
         const btnReabrir = document.getElementById('btn-reabrir-panel');
         if (btnReabrir) btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
     }
 
-    document.getElementById('colonia-name').textContent = props.nombre;
-    document.getElementById('colonia-temp').textContent = `${diagnostico.temp.toFixed(1)}°C`;
-    document.getElementById('ageb-code').textContent = props.num_agebs;
-    document.getElementById('area-total').textContent = `${props.area_ha.toLocaleString()} ha`;
-    document.getElementById('poblacion-total').textContent = props.poblacion.toLocaleString();
-    document.getElementById('densidad-total').textContent = `${props.densidad_hab_km2.toLocaleString()} hab/km²`;
-    document.getElementById('terreno-utilizable').textContent = `${props.terreno_utilizable_ha} ha (${props.terreno_utilizable_pct}%)`;
-    document.getElementById('tree-count').textContent = `${diagnostico.arboles.toLocaleString()} árboles`;
-    document.getElementById('species-suggested').textContent = especies;
-    document.getElementById('temp-reduction').textContent = `-${diagnostico.reduccion.toFixed(1)}°C`;
+    // Inyección robusta mapeando variantes de IDs comunes de tus versiones
+    const elNombre = document.getElementById('colonia-name') || document.getElementById('colonia-nombre');
+    if (elNombre) elNombre.textContent = props.nombre;
 
-    const txtJustificacion = document.getElementById('justificacion-tecnica') || document.getElementById('ai-rationale');
+    const elTemp = document.getElementById('colonia-temp');
+    if (elTemp) elTemp.textContent = `${diagnostico.temp.toFixed(1)}°C`;
+
+    const elAgeb = document.getElementById('ageb-code');
+    if (elAgeb) elAgeb.textContent = props.num_agebs;
+
+    const elArea = document.getElementById('area-total');
+    if (elArea) elArea.textContent = `${props.area_ha.toLocaleString()} ha`;
+
+    const elPob = document.getElementById('poblacion-total') || document.getElementById('colonia-poblacion');
+    if (elPob) elPob.textContent = props.poblacion.toLocaleString();
+
+    const elDens = document.getElementById('densidad-total');
+    if (elDens) elDens.textContent = `${props.densidad_hab_km2.toLocaleString()} hab/km²`;
+
+    const elTerr = document.getElementById('terreno-utilizable');
+    if (elTerr) elTerr.textContent = `${props.terreno_utilizable_ha} ha (${props.terreno_utilizable_pct}%)`;
+
+    const elTree = document.getElementById('tree-count') || document.getElementById('arboles-cantidad');
+    if (elTree) elTree.textContent = `${diagnostico.arboles.toLocaleString()} árboles`;
+
+    const elSpec = document.getElementById('species-suggested') || document.getElementById('especies-sugeridas');
+    if (elSpec) elSpec.textContent = especies;
+
+    const elReduc = document.getElementById('temp-reduction') || document.getElementById('enfriamiento-valor');
+    if (elReduc) elReduc.textContent = `-${diagnostico.reduccion.toFixed(1)}°C`;
+
+    const txtJustificacion = document.getElementById('justificacion-tecnica') || document.getElementById('ai-rationale') || document.getElementById('justificacion-texto');
     if (txtJustificacion) {
         txtJustificacion.textContent = justificacion;
     }
@@ -242,7 +290,7 @@ function deshighlightAlHover(layer) {
 }
 
 function actualizarEstadoAPI(estado, temperatura) {
-    const statusText = document.getElementById('api-status-text');
+    const statusText = document.getElementById('api-status-text') || document.querySelector('.status-text');
     if (!statusText) return;
 
     if (estado === 'conectado') {
@@ -260,7 +308,6 @@ function actualizarEstadoAPI(estado, temperatura) {
 function inicializarGestosMovil() {
     if (window.innerWidth > 768) return;
 
-    const sidebar = document.querySelector('.sidebar');
     const dragHandle = document.querySelector('.sidebar-header'); 
     if (!sidebar || !dragHandle) return;
 
@@ -277,7 +324,6 @@ function inicializarGestosMovil() {
             background: #2a9d8f;
             color: white;
             border: none;
-            padding: 12px 24px;
             border-radius: 30px;
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -293,7 +339,6 @@ function inicializarGestosMovil() {
             btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
         });
     }
-
 
     dragHandle.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
@@ -329,14 +374,13 @@ function inicializarGestosMovil() {
 }
 
 function configurarEventos() {
-    const btnCerrar = document.getElementById('close-details');
+    const btnCerrar = document.getElementById('close-details') || document.querySelector('.close-btn');
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarDetalles);
 
-    const btnExportar = document.getElementById('export-btn');
+    const btnExportar = document.getElementById('export-btn') || document.querySelector('.action-btn');
     if (btnExportar) btnExportar.addEventListener('click', exportarDiagnostico);
 
     window.addEventListener('resize', () => {
-        const sidebar = document.querySelector('.sidebar');
         if (sidebar && window.innerWidth > 768) {
             sidebar.classList.remove('minimizado');
             sidebar.style.transform = '';
@@ -347,8 +391,9 @@ function configurarEventos() {
 }
 
 function cerrarDetalles() {
-    document.getElementById('instruction').classList.remove('hidden');
-    document.getElementById('details').classList.add('hidden');
+    // Activar instrucciones y compactación mediante la nueva lógica
+    mostrarInstrucciones();
+
     if (sectorSeleccionado) {
         mapa.removeLayer(sectorSeleccionado);
         sectorSeleccionado = null;
@@ -365,7 +410,6 @@ function exportarDiagnostico() {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
-   
     const contenidoHtml = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
@@ -460,13 +504,11 @@ function exportarDiagnostico() {
         </html>
     `;
 
-
     const blob = new Blob(['\ufeff' + contenidoHtml], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     
-  
     link.download = `Diagnostico_Urbano_${props.nombre.replace(/\s+/g, '_')}.doc`;
     
     document.body.appendChild(link);
