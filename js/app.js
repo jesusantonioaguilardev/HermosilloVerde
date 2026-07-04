@@ -301,4 +301,99 @@ function inicializarGestosMovil() {
     }, { passive: true });
 
     dragHandle.addEventListener('touchmove', (e) => {
-        touchMoveY = e.touches
+        touchMoveY = e.touches[0].clientY;
+        const deltaY = touchMoveY - touchStartY;
+
+        if (deltaY > 0) {
+            sidebar.style.transform = `translateY(${deltaY}px)`;
+        }
+    }, { passive: true });
+
+    dragHandle.addEventListener('touchend', (e) => {
+        sidebar.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+        const deltaY = touchMoveY - touchStartY;
+        const alturaPanel = sidebar.offsetHeight;
+
+        if (deltaY > alturaPanel * 0.15) { // Un 15% de arrastre en el tirador basta para guardarlo
+            sidebar.classList.add('minimizado');
+            sidebar.style.transform = 'translateY(100%)';
+            btnReabrir.style.transform = 'translateX(-50%) translateY(0)';
+        } else {
+            sidebar.classList.remove('minimizado');
+            sidebar.style.transform = 'translateY(0)';
+            btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
+        }
+        touchStartY = 0;
+        touchMoveY = 0;
+    });
+}
+
+function configurarEventos() {
+    const btnCerrar = document.getElementById('close-details');
+    if (btnCerrar) btnCerrar.addEventListener('click', cerrarDetalles);
+
+    const btnExportar = document.getElementById('export-btn');
+    if (btnExportar) btnExportar.addEventListener('click', exportarDiagnostico);
+
+    window.addEventListener('resize', () => {
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar && window.innerWidth > 768) {
+            sidebar.classList.remove('minimizado');
+            sidebar.style.transform = '';
+            const btnReabrir = document.getElementById('btn-reabrir-panel');
+            if (btnReabrir) btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
+        }
+    });
+}
+
+function cerrarDetalles() {
+    document.getElementById('instruction').classList.remove('hidden');
+    document.getElementById('details').classList.add('hidden');
+    if (sectorSeleccionado) {
+        mapa.removeLayer(sectorSeleccionado);
+        sectorSeleccionado = null;
+    }
+    const btnReabrir = document.getElementById('btn-reabrir-panel');
+    if (btnReabrir) btnReabrir.style.transform = 'translateX(-50%) translateY(100px)';
+}
+
+function exportarDiagnostico() {
+    if (!window.diagnosticoActual) return;
+    const { props, diagnostico, justificacion, especies } = window.diagnosticoActual;
+
+    const salida = {
+        fecha: new Date().toISOString(),
+        colonia: props.nombre,
+        area_ha: props.area_ha,
+        poblacion: props.poblacion,
+        densidad_hab_km2: props.densidad_hab_km2,
+        terreno_utilizable_ha: props.terreno_utilizable_ha,
+        terreno_utilizable_pct: props.terreno_utilizable_pct,
+        temperatura_estimada: `${diagnostico.temp.toFixed(1)}°C`,
+        severidad: diagnostico.severidad,
+        arboles_recomendados: diagnostico.arboles,
+        especies_recomendadas: especies,
+        reduccion_termica_estimada: `${diagnostico.reduccion.toFixed(1)}°C`,
+        justificacion_tecnica: justificacion
+    };
+
+    const blob = new Blob([JSON.stringify(salida, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostico_${props.nombre.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function mostrarSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.classList.add('active');
+}
+
+function ocultarSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.classList.remove('active');
+}
