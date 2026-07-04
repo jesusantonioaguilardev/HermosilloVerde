@@ -261,7 +261,7 @@ function inicializarGestosMovil() {
     if (window.innerWidth > 768) return;
 
     const sidebar = document.querySelector('.sidebar');
-    const dragHandle = document.querySelector('.sidebar-handle'); // Usamos el tirador dedicado
+    const dragHandle = document.querySelector('.sidebar-header'); 
     if (!sidebar || !dragHandle) return;
 
     let btnReabrir = document.getElementById('btn-reabrir-panel');
@@ -294,7 +294,7 @@ function inicializarGestosMovil() {
         });
     }
 
-    // Los eventos táctiles ahora se vinculan ÚNICAMENTE al tirador superior
+
     dragHandle.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
         sidebar.style.transition = 'none';
@@ -314,7 +314,7 @@ function inicializarGestosMovil() {
         const deltaY = touchMoveY - touchStartY;
         const alturaPanel = sidebar.offsetHeight;
 
-        if (deltaY > alturaPanel * 0.15) { // Un 15% de arrastre en el tirador basta para guardarlo
+        if (deltaY > alturaPanel * 0.15) { 
             sidebar.classList.add('minimizado');
             sidebar.style.transform = 'translateY(100%)';
             btnReabrir.style.transform = 'translateX(-50%) translateY(0)';
