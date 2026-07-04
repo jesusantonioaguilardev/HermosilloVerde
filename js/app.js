@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
     configurarEventos();
     mostrarSpinner();
     cargarClimaReal();
-    inicializarGestosMovil();
+    ;
     setInterval(cargarClimaReal, CONFIG.intervaloClimaMs);
 });
 
@@ -330,11 +330,11 @@ function inicializarGestosMovil() {
     }, { passive: true });
 
     sidebar.addEventListener('touchend', (e) => {
-        sidebar.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+        sidebar.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
         const deltaY = touchMoveY - touchStartY;
         const alturaPanel = sidebar.offsetHeight;
 
-        if (deltaY > alturaPanel * 0.25) {
+        if (deltaY > alturaPanel * 0.20) {
             sidebar.classList.add('minimizado');
             sidebar.style.transform = '';
         } else {
@@ -346,14 +346,13 @@ function inicializarGestosMovil() {
     });
 
     sidebar.addEventListener('click', (e) => {
-        if (e.clientY - sidebar.getBoundingClientRect().top < 35) {
-            sidebar.style.transition = 'transform 0.3s ease';
-            sidebar.classList.toggle('minimizado');
-            sidebar.style.transform = '';
+        const topHeaderArea = e.clientY - sidebar.getBoundingClientRect().top;
+        if (topHeaderArea < 60 && sidebar.classList.contains('minimizado')) {
+            sidebar.classList.remove('minimizado');
+            sidebar.style.transform = 'translateY(0)';
         }
     });
 }
-
 function configurarEventos() {
     const btnCerrar = document.getElementById('close-details');
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarDetalles);
