@@ -48,24 +48,45 @@ html, body {
     background: white;
 }
 
+
 .sidebar {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    left: auto;
-    width: 420px;
-    height: calc(100vh - 40px);
-    max-height: calc(100vh - 40px);
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 1000;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideInRight 0.3s ease-out;
+    transition:
+        height 0.35s ease,
+        max-height 0.35s ease,
+        transform 0.35s ease;
+}
+
+
+.sidebar.compact {
+    height: auto;
+    max-height: 260px;
+}
+
+
+.sidebar.compact #details {
+    display: none !important;
+}
+
+.sidebar.compact #instruction {
+    display: flex !important;
+}
+
+@media (max-width: 768px) {
+
+    .sidebar.compact {
+        height: auto !important;
+        max-height: 220px !important;
+        min-height: 180px !important;
+        border-radius: 24px 24px 0 0 !important;
+    }
+
+    .sidebar.compact #details {
+        display: none !important;
+    }
+
+    .sidebar.compact #instruction {
+        display: flex !important;
+    }
 }
 
 @keyframes slideInRight {
