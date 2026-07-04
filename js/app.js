@@ -323,6 +323,37 @@ function cerrarDetalles() {
     }
 }
 
+function exportarDiagnostico() {
+    if (!window.diagnosticoActual) return;
+    const { props, diagnostico, justificacion, especies } = window.diagnosticoActual;
+
+    const salida = {
+        fecha: new Date().toISOString(),
+        colonia: props.nombre,
+        area_ha: props.area_ha,
+        poblacion: props.poblacion,
+        densidad_hab_km2: props.densidad_hab_km2,
+        terreno_utilizable_ha: props.terreno_utilizable_ha,
+        terreno_utilizable_pct: props.terreno_utilizable_pct,
+        temperatura_estimada: `${diagnostico.temp.toFixed(1)}°C`,
+        severidad: diagnostico.severidad,
+        arboles_recomendados: diagnostico.arboles,
+        especies_recomendadas: especies,
+        reduccion_termica_estimada: `${diagnostico.reduccion.toFixed(1)}°C`,
+        justificacion_tecnica: justificacion
+    };
+
+    const blob = new Blob([JSON.stringify(salida, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostico_${props.nombre.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 function mostrarSpinner() {
     const spinner = document.getElementById('loading-spinner');
     if (spinner) spinner.classList.add('active');
