@@ -69,13 +69,9 @@ html, body {
     transition: height 0.35s ease, max-height 0.35s ease, transform 0.35s ease;
 }
 
-/* =======================================================
-   SIDEBAR COMPACTA (cuando no hay colonia seleccionada)
-   ======================================================= */
-/* ----------- ESCRITORIO ----------- */
 .sidebar.compact {
-    height: auto !important;
-    max-height: 250px !important;
+    height: 220px !important;
+    max-height: 220px !important;
 }
 
 .sidebar.compact #details {
@@ -492,7 +488,6 @@ h3 i { color: var(--color-primary); }
         overflow: hidden !important;
     }
 
-    /* ----------- MÓVIL COMPACTA ----------- */
     .sidebar.compact {
         height: auto !important;
         max-height: 220px !important;
