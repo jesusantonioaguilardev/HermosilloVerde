@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
     configurarEventos();
     mostrarSpinner();
     cargarClimaReal();
-    ;
+    inicializarGestosMovil();
     setInterval(cargarClimaReal, CONFIG.intervaloClimaMs);
 });
 
@@ -124,72 +124,11 @@ function estiloColonia(feature) {
     const temp = calcularTemperaturaZona(feature.properties);
     return {
         fillColor: obtenerColorTermico(temp),
-        weight: 1, // Más delgado
-        opacity: 0.4, // Borde muy suave
-        color: '#ffffff', // Borde blanco para que se fusione limpiamente
-        fillOpacity: 0.35 // Relleno translúcido "soft" para ver las calles del fondo
+        weight: 1,
+        opacity: 0.4,
+        color: '#ffffff',
+        fillOpacity: 0.35
     };
-}
-
-function seleccionarColonia(layer, feature) {
-    const props = feature.properties;
-
-    if (sectorSeleccionado) mapa.removeLayer(sectorSeleccionado);
-
-    // Resaltado elegante del sector seleccionado
-    sectorSeleccionado = L.geoJSON(feature, {
-        style: {
-            fillColor: obtenerColorTermico(calcularTemperaturaZona(props)),
-            weight: 2,
-            opacity: 0.8,
-            color: '#2a9d8f', // En lugar de negro, usamos el verde principal de tu app
-            fillOpacity: 0.55
-        }
-    }).addTo(mapa);
-
-    const diagnostico = calcularDiagnostico(props);
-    const especies = CONFIG.especies[diagnostico.severidad];
-    const justificacion = generarJustificacion(props, diagnostico);
-
-    document.getElementById('instruction').classList.add('hidden');
-    document.getElementById('details').classList.remove('hidden');
-
-    const sidebarElement = document.querySelector('.sidebar');
-    if (sidebarElement) {
-        sidebarElement.classList.remove('minimizado');
-        sidebarElement.style.transform = 'translateY(0)';
-    }
-
-    document.getElementById('colonia-name').textContent = props.nombre;
-    document.getElementById('colonia-temp').textContent = `${diagnostico.temp.toFixed(1)}°C`;
-    document.getElementById('ageb-code').textContent = props.num_agebs;
-    document.getElementById('area-total').textContent = `${props.area_ha.toLocaleString()} ha`;
-    document.getElementById('poblacion-total').textContent = props.poblacion.toLocaleString();
-    document.getElementById('densidad-total').textContent = `${props.densidad_hab_km2.toLocaleString()} hab/km²`;
-    document.getElementById('terreno-utilizable').textContent = `${props.terreno_utilizable_ha} ha (${props.terreno_utilizable_pct}%)`;
-    document.getElementById('tree-count').textContent = `${diagnostico.arboles.toLocaleString()} árboles`;
-    document.getElementById('species-suggested').textContent = especies;
-    document.getElementById('temp-reduction').textContent = `-${diagnostico.reduccion.toFixed(1)}°C`;
-
-    const txtJustificacion = document.getElementById('justificacion-tecnica') || document.getElementById('ai-rationale');
-    if (txtJustificacion) {
-        txtJustificacion.textContent = justificacion;
-    }
-
-    window.diagnosticoActual = { props, diagnostico, justificacion, especies };
-
-    mapa.fitBounds(L.geoJSON(feature).getBounds(), { padding: window.innerWidth > 768 ? [100, 350] : [40, 40] });
-}
-
-function resaltarAlHover(layer) {
-    if (layer !== sectorSeleccionado) {
-        layer.setStyle({
-            weight: 1.5,
-            color: '#2a9d8f',
-            opacity: 0.7,
-            fillOpacity: 0.45
-        });
-    }
 }
 
 function procesarColonia(feature, layer) {
@@ -240,10 +179,10 @@ function seleccionarColonia(layer, feature) {
     sectorSeleccionado = L.geoJSON(feature, {
         style: {
             fillColor: obtenerColorTermico(calcularTemperaturaZona(props)),
-            weight: 2.5,
-            opacity: 1,
-            color: '#000000',
-            fillOpacity: 0.7
+            weight: 2,
+            opacity: 0.8,
+            color: '#2a9d8f',
+            fillOpacity: 0.55
         }
     }).addTo(mapa);
 
@@ -283,7 +222,12 @@ function seleccionarColonia(layer, feature) {
 
 function resaltarAlHover(layer) {
     if (layer !== sectorSeleccionado) {
-        layer.setStyle({ weight: 2, color: '#2a9d8f', opacity: 0.9, fillOpacity: 0.6 });
+        layer.setStyle({
+            weight: 1.5,
+            color: '#2a9d8f',
+            opacity: 0.7,
+            fillOpacity: 0.45
+        });
     }
 }
 
@@ -353,6 +297,7 @@ function inicializarGestosMovil() {
         }
     });
 }
+
 function configurarEventos() {
     const btnCerrar = document.getElementById('close-details');
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarDetalles);
@@ -376,37 +321,6 @@ function cerrarDetalles() {
         mapa.removeLayer(sectorSeleccionado);
         sectorSeleccionado = null;
     }
-}
-
-function exportarDiagnostico() {
-    if (!window.diagnosticoActual) return;
-    const { props, diagnostico, justificacion, especies } = window.diagnosticoActual;
-
-    const salida = {
-        fecha: new Date().toISOString(),
-        colonia: props.nombre,
-        area_ha: props.area_ha,
-        poblacion: props.poblacion,
-        densidad_hab_km2: props.densidad_hab_km2,
-        terreno_utilizable_ha: props.terreno_utilizable_ha,
-        terreno_utilizable_pct: props.terreno_utilizable_pct,
-        temperatura_estimada: `${diagnostico.temp.toFixed(1)}°C`,
-        severidad: diagnostico.severidad,
-        arboles_recomendados: diagnostico.arboles,
-        especies_recomendadas: especies,
-        reduccion_termica_estimada: `${diagnostico.reduccion.toFixed(1)}°C`,
-        justificacion_tecnica: justificacion
-    };
-
-    const blob = new Blob([JSON.stringify(salida, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `diagnostico_${props.nombre.replace(/\s+/g, '_')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
 }
 
 function mostrarSpinner() {
